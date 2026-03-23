@@ -1,29 +1,39 @@
 <aside class="sidebar" [class.sidebar--collapsed]="collapsed">
   <div class="sidebar__top">
     <span class="sidebar__brand" [class.sidebar__brand--hidden]="collapsed">Neosoft</span>
-    <button mat-icon-button type="button" (click)="toggle()" aria-label="Contraer sidebar">
+    <button mat-icon-button type="button" (click)="toggle()" aria-label="Contraer o expandir menú lateral">
       <mat-icon>{{ collapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
     </button>
   </div>
 
-  <nav class="sidebar__nav">
+  <mat-nav-list class="sidebar__nav">
     <a
-      mat-button
-      class="sidebar__link"
+      mat-list-item
+      class="sidebar__item"
       routerLink="/users"
-      routerLinkActive="sidebar__link--active"
+      routerLinkActive="mat-mdc-list-item-selected sidebar__item--active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      <mat-icon>group</mat-icon>
-      <span [class.sidebar__label--hidden]="collapsed">Usuarios</span>
+      <mat-icon matListItemIcon class="sidebar__icon">group</mat-icon>
+      <span matListItemTitle [class.sidebar__label--hidden]="collapsed">Usuarios</span>
     </a>
-    <a mat-button class="sidebar__link" routerLink="/variables" routerLinkActive="sidebar__link--active">
-      <mat-icon>tune</mat-icon>
-      <span [class.sidebar__label--hidden]="collapsed">Variables</span>
+    <a
+      mat-list-item
+      class="sidebar__item"
+      routerLink="/variables"
+      routerLinkActive="mat-mdc-list-item-selected sidebar__item--active"
+    >
+      <mat-icon matListItemIcon class="sidebar__icon">tune</mat-icon>
+      <span matListItemTitle [class.sidebar__label--hidden]="collapsed">Variables</span>
     </a>
-    <a mat-button class="sidebar__link" routerLink="/roles" routerLinkActive="sidebar__link--active">
-      <mat-icon>security</mat-icon>
-      <span [class.sidebar__label--hidden]="collapsed">Roles</span>
+    <a
+      mat-list-item
+      class="sidebar__item"
+      routerLink="/roles"
+      routerLinkActive="mat-mdc-list-item-selected sidebar__item--active"
+    >
+      <mat-icon matListItemIcon class="sidebar__icon">security</mat-icon>
+      <span matListItemTitle [class.sidebar__label--hidden]="collapsed">Roles</span>
     </a>
-  </nav>
+  </mat-nav-list>
 </aside>

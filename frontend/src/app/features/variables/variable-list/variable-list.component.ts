@@ -6,15 +6,19 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Router, RouterLink } from '@angular/router';
 import { catchError, Observable, of, Subject, switchMap } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 import { Variable } from '../../../core/models/variable.model';
 import { VariableService } from '../../../core/services/variable.service';
+import { listFadeIn, rowAnimation } from '../../../shared/animations/list.animations';
 import {
   ConfirmDialogComponent,
   ConfirmDialogData,
 } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import {
+  VariableFormComponent,
+  VariableFormDialogData,
+} from '../variable-form/variable-form.component';
 
 @Component({
   selector: 'app-variable-list',
@@ -26,16 +30,22 @@ import {
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    RouterLink,
   ],
   templateUrl: './variable-list.component.html',
   styleUrl: './variable-list.component.scss',
+  animations: [listFadeIn, rowAnimation],
 })
 export class VariableListComponent {
   private readonly variableService = inject(VariableService);
   private readonly dialog = inject(MatDialog);
-  private readonly router = inject(Router);
   private readonly refresh$ = new Subject<void>();
+
+  private static readonly formDialogConfig = {
+    width: '480px',
+    maxWidth: '95vw',
+    disableClose: true,
+    panelClass: 'neosoft-dialog',
+  } as const;
 
   readonly displayedColumns: readonly string[] = ['id', 'name', 'value', 'type', 'actions'];
 
@@ -52,18 +62,46 @@ export class VariableListComponent {
     return row.id;
   }
 
+  openCreate(): void {
+    const data: VariableFormDialogData = { mode: 'create' };
+    this.dialog
+      .open(VariableFormComponent, {
+        ...VariableListComponent.formDialogConfig,
+        data,
+      })
+      .afterClosed()
+      .subscribe((saved: boolean | undefined) => {
+        if (saved === true) {
+          this.refresh$.next();
+        }
+      });
+  }
+
   edit(variable: Variable): void {
-    void this.router.navigate(['/variables', variable.id, 'edit']);
+    const data: VariableFormDialogData = { mode: 'edit', variableId: variable.id };
+    this.dialog
+      .open(VariableFormComponent, {
+        ...VariableListComponent.formDialogConfig,
+        data,
+      })
+      .afterClosed()
+      .subscribe((saved: boolean | undefined) => {
+        if (saved === true) {
+          this.refresh$.next();
+        }
+      });
   }
 
   confirmDelete(variable: Variable): void {
-    const data: ConfirmDialogData = {
+    const dialogData: ConfirmDialogData = {
       title: 'Eliminar variable',
       message: `¿Eliminar ${variable.name}? Esta acción no se puede deshacer.`,
     };
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '420px',
-      data,
+      maxWidth: '95vw',
+      panelClass: 'neosoft-dialog',
+      data: dialogData,
     });
     ref.afterClosed().subscribe((confirmed: boolean | undefined) => {
       if (confirmed === true) {

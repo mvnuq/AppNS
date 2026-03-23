@@ -1,12 +1,12 @@
 .layout {
   display: flex;
   min-height: 100vh;
-  background: #f1f3f6;
+  background: var(--neosoft-page-bg, #f5f5f7);
 }
 
 .app-shell {
   flex: 1 1 auto;
-  padding: 1.5rem clamp(1rem, 3vw, 2rem);
+  padding: var(--neosoft-space-lg, 24px) clamp(var(--neosoft-space-md, 16px), 3vw, 32px);
 }
 
 .app-shell__content {

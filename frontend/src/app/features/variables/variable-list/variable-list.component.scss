@@ -1,28 +1,53 @@
-.card {
+.neosoft-elevated-card {
   max-width: 1200px;
   margin: 0 auto;
+  border-radius: 16px !important;
+  box-shadow: var(--mat-sys-level2, 0 3px 6px rgba(0, 0, 0, 0.12)) !important;
+}
+
+.card-header {
+  padding: var(--neosoft-space-lg, 24px) var(--neosoft-space-lg, 24px) 0;
+}
+
+.card-content {
+  padding: var(--neosoft-space-md, 16px) var(--neosoft-space-lg, 24px)
+    var(--neosoft-space-lg, 24px);
 }
 
 .toolbar {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 1rem;
+  margin-bottom: var(--neosoft-space-md, 16px);
+
+  button mat-icon {
+    margin-right: 8px;
+  }
 }
 
 .table-wrap {
   overflow-x: auto;
 }
 
+.data-table {
+  width: 100%;
+}
+
+/* MDC puede apilar el contenido de la celda en columna */
+:host ::ng-deep .data-table .mat-mdc-cell.actions-col {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
 .actions-col {
   width: 120px;
   text-align: right;
+  white-space: nowrap;
 }
 
 .empty {
-  margin: 1rem 0 0;
+  margin: var(--neosoft-space-md, 16px) 0 0;
   color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
-}
-
-table {
-  width: 100%;
 }

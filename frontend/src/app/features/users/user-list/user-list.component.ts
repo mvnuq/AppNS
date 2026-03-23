@@ -6,15 +6,19 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Router, RouterLink } from '@angular/router';
 import { catchError, Observable, of, Subject, switchMap } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 import { User } from '../../../core/models/user.model';
 import { UserService } from '../../../core/services/user.service';
+import { listFadeIn, rowAnimation } from '../../../shared/animations/list.animations';
 import {
   ConfirmDialogComponent,
   ConfirmDialogData,
 } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import {
+  UserFormComponent,
+  UserFormDialogData,
+} from '../user-form/user-form.component';
 
 @Component({
   selector: 'app-user-list',
@@ -26,16 +30,22 @@ import {
     MatIconModule,
     MatCardModule,
     MatTooltipModule,
-    RouterLink,
   ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss',
+  animations: [listFadeIn, rowAnimation],
 })
 export class UserListComponent {
   private readonly userService = inject(UserService);
   private readonly dialog = inject(MatDialog);
-  private readonly router = inject(Router);
   private readonly refresh$ = new Subject<void>();
+
+  private static readonly formDialogConfig = {
+    width: '520px',
+    maxWidth: '95vw',
+    disableClose: true,
+    panelClass: 'neosoft-dialog',
+  } as const;
 
   readonly displayedColumns: readonly string[] = [
     'id',
@@ -58,18 +68,46 @@ export class UserListComponent {
     return user.id;
   }
 
+  openCreate(): void {
+    const data: UserFormDialogData = { mode: 'create' };
+    this.dialog
+      .open(UserFormComponent, {
+        ...UserListComponent.formDialogConfig,
+        data,
+      })
+      .afterClosed()
+      .subscribe((saved: boolean | undefined) => {
+        if (saved === true) {
+          this.refresh$.next();
+        }
+      });
+  }
+
   edit(user: User): void {
-    void this.router.navigate(['/users', user.id, 'edit']);
+    const data: UserFormDialogData = { mode: 'edit', userId: user.id };
+    this.dialog
+      .open(UserFormComponent, {
+        ...UserListComponent.formDialogConfig,
+        data,
+      })
+      .afterClosed()
+      .subscribe((saved: boolean | undefined) => {
+        if (saved === true) {
+          this.refresh$.next();
+        }
+      });
   }
 
   confirmDelete(user: User): void {
-    const data: ConfirmDialogData = {
+    const dialogData: ConfirmDialogData = {
       title: 'Eliminar usuario',
       message: `¿Eliminar a ${user.fullName}? Esta acción no se puede deshacer.`,
     };
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '420px',
-      data,
+      maxWidth: '95vw',
+      panelClass: 'neosoft-dialog',
+      data: dialogData,
     });
     ref.afterClosed().subscribe((confirmed: boolean | undefined) => {
       if (confirmed === true) {

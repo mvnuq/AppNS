@@ -1,34 +1,31 @@
 @if (vm$ | async; as vm) {
-  <mat-card class="card">
-    <mat-card-header>
-      <mat-card-title>{{ vm.mode === 'create' ? 'Nuevo rol' : 'Editar rol' }}</mat-card-title>
-      <mat-card-subtitle>Defina el nombre del rol</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      @if (vm.mode === 'edit' && vm.role === null) {
-        <p class="error-text">No se encontró el rol solicitado.</p>
-        <button mat-stroked-button type="button" routerLink="/roles">Volver al listado</button>
-      } @else {
-        <form class="form" [formGroup]="form" (ngSubmit)="submit(vm)">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="name" />
-            @if (form.controls.name.hasError('required') && form.controls.name.touched) {
-              <mat-error>El nombre es obligatorio.</mat-error>
-            }
-            @if (form.controls.name.hasError('minlength') && form.controls.name.touched) {
-              <mat-error>Mínimo 2 caracteres.</mat-error>
-            }
-          </mat-form-field>
+  <h2 mat-dialog-title>{{ vm.mode === 'create' ? 'Nuevo rol' : 'Editar rol' }}</h2>
 
-          <div class="actions">
-            <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
-            <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
-              Guardar
-            </button>
-          </div>
-        </form>
-      }
-    </mat-card-content>
-  </mat-card>
+  <mat-dialog-content class="dialog-body">
+    @if (vm.mode === 'edit' && vm.role === null) {
+      <p class="error-text">No se encontró el rol solicitado.</p>
+    } @else {
+      <form id="roleForm" class="form" [formGroup]="form" (ngSubmit)="submit(vm)">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="name" />
+          @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+            <mat-error>El nombre es obligatorio.</mat-error>
+          }
+          @if (form.controls.name.hasError('minlength') && form.controls.name.touched) {
+            <mat-error>Mínimo 2 caracteres.</mat-error>
+          }
+        </mat-form-field>
+      </form>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+    @if (!(vm.mode === 'edit' && vm.role === null)) {
+      <button mat-flat-button color="primary" type="submit" form="roleForm" [disabled]="form.invalid">
+        Guardar
+      </button>
+    }
+  </mat-dialog-actions>
 }
