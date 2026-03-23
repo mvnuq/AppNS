@@ -16,4 +16,42 @@ public class RolesController(IRoleService roleService) : ControllerBase
         var roles = await _roleService.GetAllForDropdownAsync(cancellationToken);
         return Ok(roles);
     }
+
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<RoleDto>> GetById(int id, CancellationToken cancellationToken)
+    {
+        var role = await _roleService.GetByIdAsync(id, cancellationToken);
+        if (role is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(role);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Post([FromBody] RoleDto dto, CancellationToken cancellationToken)
+    {
+        var result = await _roleService.CreateAsync(dto, cancellationToken);
+        if (!result.IsSuccess)
+        {
+            return result.ToFailureResult(this);
+        }
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Put(int id, [FromBody] RoleDto dto, CancellationToken cancellationToken)
+    {
+        var result = await _roleService.UpdateAsync(id, dto, cancellationToken);
+        return result.ToActionResult(this);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    {
+        var result = await _roleService.DeleteAsync(id, cancellationToken);
+        return result.ToActionResult(this);
+    }
 }

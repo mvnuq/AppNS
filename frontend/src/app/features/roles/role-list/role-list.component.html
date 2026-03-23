@@ -1,0 +1,61 @@
+<mat-card class="card">
+  <mat-card-header>
+    <mat-card-title>Roles</mat-card-title>
+    <mat-card-subtitle>Gestión de perfiles de acceso</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="toolbar">
+      <a mat-flat-button color="primary" routerLink="/roles/new">
+        <mat-icon>admin_panel_settings</mat-icon>
+        Nuevo rol
+      </a>
+    </div>
+
+    @if (roles$ | async; as roles) {
+      <div class="table-wrap">
+        <table mat-table [dataSource]="roles" class="mat-elevation-z0">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Nombre</th>
+            <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions-col">Acciones</th>
+            <td mat-cell *matCellDef="let row" class="actions-col">
+              <button
+                mat-icon-button
+                type="button"
+                color="primary"
+                matTooltip="Editar"
+                (click)="edit(row)"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                color="warn"
+                matTooltip="Eliminar"
+                (click)="confirmDelete(row)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns; trackBy: trackByRoleId"></tr>
+        </table>
+
+        @if (roles.length === 0) {
+          <p class="empty">No hay roles registrados.</p>
+        }
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

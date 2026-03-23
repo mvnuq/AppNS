@@ -1,0 +1,15 @@
+<mat-toolbar class="navbar" color="primary">
+  <span class="navbar__brand">Neosoft</span>
+  <span class="navbar__spacer"></span>
+  <a
+    mat-button
+    routerLink="/users"
+    routerLinkActive="navbar__link--active"
+    [routerLinkActiveOptions]="{ exact: true }"
+  >
+    Usuarios
+  </a>
+  <a mat-button routerLink="/variables" routerLinkActive="navbar__link--active">
+    Variables
+  </a>
+</mat-toolbar>

@@ -3,14 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Neosoft.Api.Data;
 using Neosoft.Api.DependencyInjection;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Carga .env en variables de entorno (ConnectionStrings__DefaultConnection → ConnectionStrings:DefaultConnection).
-var envFile = Path.Combine(builder.Environment.ContentRootPath, ".env");
+// Cargar .env antes de CreateBuilder para que ConnectionStrings__DefaultConnection entre en IConfiguration.
+var envFile = Path.Combine(Directory.GetCurrentDirectory(), ".env");
 if (File.Exists(envFile))
 {
     Env.Load(envFile);
 }
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers()
@@ -24,6 +24,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        throw new InvalidOperationException(
+            "Falta ConnectionStrings:DefaultConnection. Copia .env.example como .env y configura MySQL.");
+    }
+
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 

@@ -1,0 +1,50 @@
+@if (vm$ | async; as vm) {
+  <mat-card class="card">
+    <mat-card-header>
+      <mat-card-title>{{ vm.mode === 'create' ? 'Nueva variable' : 'Editar variable' }}</mat-card-title>
+      <mat-card-subtitle>Complete los datos del parámetro</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @if (vm.mode === 'edit' && vm.variable === null) {
+        <p class="error-text">No se encontró la variable solicitada.</p>
+        <button mat-stroked-button type="button" routerLink="/variables">Volver al listado</button>
+      } @else {
+        <form class="form" [formGroup]="form" (ngSubmit)="submit(vm)">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="name" />
+            @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+              <mat-error>El nombre es obligatorio.</mat-error>
+            }
+            @if (form.controls.name.hasError('minlength') && form.controls.name.touched) {
+              <mat-error>Mínimo 2 caracteres.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Valor</mat-label>
+            <input matInput formControlName="value" />
+            @if (form.controls.value.hasError('required') && form.controls.value.touched) {
+              <mat-error>El valor es obligatorio.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tipo</mat-label>
+            <input matInput formControlName="type" />
+            @if (form.controls.type.hasError('required') && form.controls.type.touched) {
+              <mat-error>El tipo es obligatorio.</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="actions">
+            <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+              Guardar
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+}

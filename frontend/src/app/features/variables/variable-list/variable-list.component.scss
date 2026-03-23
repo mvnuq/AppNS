@@ -1,0 +1,28 @@
+.card {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.actions-col {
+  width: 120px;
+  text-align: right;
+}
+
+.empty {
+  margin: 1rem 0 0;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+}
+
+table {
+  width: 100%;
+}

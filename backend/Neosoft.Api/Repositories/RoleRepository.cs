@@ -18,4 +18,28 @@ public sealed class RoleRepository(ApplicationDbContext context) : IRoleReposito
             .OrderBy(r => r.Name)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<Role?> GetByIdReadOnlyAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Roles
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+    }
+
+    public async Task<Role?> GetByIdTrackedAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Roles
+            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+    }
+
+    public Task<bool> HasUsersAsync(int roleId, CancellationToken cancellationToken = default) =>
+        _context.Users.AnyAsync(u => u.RoleId == roleId, cancellationToken);
+
+    public Task AddAsync(Role role, CancellationToken cancellationToken = default)
+    {
+        _context.Roles.Add(role);
+        return Task.CompletedTask;
+    }
+
+    public void Remove(Role role) => _context.Roles.Remove(role);
 }

@@ -18,8 +18,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.ToTable("users");
             entity.HasKey(e => e.Id);
 
-            entity.Property(e => e.FullName).IsRequired();
-            entity.Property(e => e.Email).IsRequired();
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.FullName).HasColumnName("full_name").IsRequired();
+            entity.Property(e => e.Email).HasColumnName("email").IsRequired();
+            entity.Property(e => e.RoleId).HasColumnName("role_id");
 
             entity.HasOne(e => e.Role)
                 .WithMany(r => r.Users)
@@ -30,7 +32,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         {
             entity.ToTable("roles");
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Name).IsRequired();
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name).HasColumnName("name").IsRequired();
         });
 
         modelBuilder.Entity<Variable>(entity =>
