@@ -41,9 +41,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.ToTable("variables");
             entity.HasKey(e => e.Id);
 
-            entity.Property(e => e.Name).IsRequired();
-            entity.Property(e => e.Value).IsRequired();
-            entity.Property(e => e.Type).IsRequired();
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name).HasColumnName("name").IsRequired();
+            entity.Property(e => e.Value).HasColumnName("value").IsRequired();
+            entity.Property(e => e.Type).HasColumnName("type").IsRequired();
         });
     }
 }

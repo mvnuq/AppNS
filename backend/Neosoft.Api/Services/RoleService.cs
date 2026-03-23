@@ -28,10 +28,6 @@ public sealed class RoleService(
     public async Task<ServiceResult<RoleDto>> CreateAsync(RoleDto dto, CancellationToken cancellationToken = default)
     {
         var name = dto.Name.Trim();
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return ServiceResult<RoleDto>.Validation("El nombre del rol es obligatorio.");
-        }
 
         var role = new Role
         {
@@ -53,10 +49,6 @@ public sealed class RoleService(
         }
 
         var name = dto.Name.Trim();
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return ServiceResult.Validation("El nombre del rol es obligatorio.");
-        }
 
         role.Name = name;
         await _unitOfWork.SaveChangesAsync(cancellationToken);

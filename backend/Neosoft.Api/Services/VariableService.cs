@@ -1,6 +1,7 @@
 using Neosoft.Api.Common;
 using Neosoft.Api.Data;
 using Neosoft.Api.Mapping;
+using Neosoft.Api.Models;
 using Neosoft.Api.Models.DTOs;
 using Neosoft.Api.Models.Entities;
 using Neosoft.Api.Repositories;
@@ -28,6 +29,11 @@ public sealed class VariableService(
 
     public async Task<ServiceResult<VariableDto>> CreateAsync(VariableDto dto, CancellationToken cancellationToken = default)
     {
+        if (!VariableType.IsValid(dto.Type))
+        {
+            return ServiceResult<VariableDto>.Validation("El tipo debe ser texto, numérico o booleano.");
+        }
+
         var variable = new Variable
         {
             Name = dto.Name,
@@ -47,6 +53,11 @@ public sealed class VariableService(
         if (variable is null)
         {
             return ServiceResult.NotFound();
+        }
+
+        if (!VariableType.IsValid(dto.Type))
+        {
+            return ServiceResult.Validation("El tipo debe ser texto, numérico o booleano.");
         }
 
         variable.Name = dto.Name;

@@ -31,9 +31,13 @@
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Tipo</mat-label>
-            <input matInput formControlName="type" />
+            <mat-select formControlName="type">
+              @for (opt of typeOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
             @if (form.controls.type.hasError('required') && form.controls.type.touched) {
-              <mat-error>El tipo es obligatorio.</mat-error>
+              <mat-error>Seleccione un tipo.</mat-error>
             }
           </mat-form-field>
 

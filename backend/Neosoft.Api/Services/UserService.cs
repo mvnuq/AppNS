@@ -32,7 +32,7 @@ public sealed class UserService(
     {
         if (!await _roleRepository.ExistsAsync(dto.RoleId, cancellationToken))
         {
-            return ServiceResult<UserDto>.Validation("The specified RoleId does not exist.");
+            return ServiceResult<UserDto>.Validation("El rol indicado no existe.");
         }
 
         var user = new User
@@ -48,7 +48,7 @@ public sealed class UserService(
         var created = await _userRepository.GetByIdWithRoleAsync(user.Id, cancellationToken);
         if (created is null)
         {
-            return ServiceResult<UserDto>.Validation("User could not be reloaded after creation.");
+            return ServiceResult<UserDto>.Validation("No se pudo recuperar el usuario tras crearlo.");
         }
 
         return ServiceResult<UserDto>.Ok(created.ToDto());
@@ -64,7 +64,7 @@ public sealed class UserService(
 
         if (!await _roleRepository.ExistsAsync(dto.RoleId, cancellationToken))
         {
-            return ServiceResult.Validation("The specified RoleId does not exist.");
+            return ServiceResult.Validation("El rol indicado no existe.");
         }
 
         user.FullName = dto.FullName;

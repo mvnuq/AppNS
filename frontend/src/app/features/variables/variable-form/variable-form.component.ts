@@ -5,10 +5,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { catchError, map, Observable, of } from 'rxjs';
 import { shareReplay, switchMap, tap } from 'rxjs/operators';
-import { Variable, VariablePayload } from '../../../core/models/variable.model';
+import {
+  VARIABLE_TYPE_OPTIONS,
+  Variable,
+  VariablePayload,
+} from '../../../core/models/variable.model';
 import { VariableService } from '../../../core/services/variable.service';
 
 interface VariableFormViewModel {
@@ -25,6 +30,7 @@ interface VariableFormViewModel {
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatButtonModule,
     RouterLink,
   ],
@@ -32,6 +38,8 @@ interface VariableFormViewModel {
   styleUrl: './variable-form.component.scss',
 })
 export class VariableFormComponent {
+  readonly typeOptions = VARIABLE_TYPE_OPTIONS;
+
   private readonly fb = inject(FormBuilder);
   private readonly variableService = inject(VariableService);
   private readonly route = inject(ActivatedRoute);
