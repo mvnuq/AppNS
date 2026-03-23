@@ -1,0 +1,68 @@
+# --- Entorno y secretos ---
+.env
+.env.local
+.env.*.local
+*.user
+secrets.json
+
+# --- .NET / Build ---
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+out/
+artifacts/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# --- NuGet ---
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+# --- Visual Studio ---
+.vs/
+*.rsuser
+*.DotSettings.user
+
+# --- Rider / JetBrains ---
+.idea/
+*.sln.iml
+
+# --- VS Code (opcional: descomenta si no quieres compartir ajustes del equipo) ---
+# .vscode/
+
+# --- Tests ---
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# --- OS ---
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# --- Node / Angular (por si agregas frontend en el repo) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+.angular/
+
+# --- Otros ---
+*.log
+*.tmp
+*.temp
+~$*
