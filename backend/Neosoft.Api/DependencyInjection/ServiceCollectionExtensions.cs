@@ -1,4 +1,5 @@
 using Neosoft.Api.Data;
+using Neosoft.Api.Logging;
 using Neosoft.Api.Repositories;
 using Neosoft.Api.Services;
 
@@ -8,6 +9,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPersistence(this IServiceCollection services)
     {
+        services.AddSingleton<IAuditLogFileWriter, AuditLogFileWriter>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();

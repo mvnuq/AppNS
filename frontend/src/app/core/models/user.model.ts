@@ -4,6 +4,8 @@ export interface User {
   email: string;
   roleId: number;
   roleName: string;
+  createdAt: Date;
+  updatedAt: Date | null;
 }
 
 export interface UserCreatePayload {

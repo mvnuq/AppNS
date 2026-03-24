@@ -10,6 +10,8 @@ export interface Variable {
   name: string;
   value: string;
   type: string;
+  createdAt: Date;
+  updatedAt: Date | null;
 }
 
 export interface VariablePayload {

@@ -17,6 +17,7 @@ import {
   ConfirmDialogData,
 } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MaintainerTableComponent } from '../../../shared/components/maintainer-table/maintainer-table.component';
+import { openMetadataDialog } from '../../../shared/components/metadata-dialog/open-metadata-dialog';
 import {
   VariableFormComponent,
   VariableFormDialogData,
@@ -96,6 +97,13 @@ export class VariableListComponent {
           this.paged.refresh();
         }
       });
+  }
+
+  viewMetadata(variable: Variable): void {
+    openMetadataDialog(this.dialog, {
+      createdAt: variable.createdAt,
+      updatedAt: variable.updatedAt,
+    });
   }
 
   confirmDelete(variable: Variable): void {

@@ -12,7 +12,9 @@ public static class VariableMappings
             Id = variable.Id,
             Name = variable.Name,
             Value = variable.Value,
-            Type = variable.Type
+            Type = variable.Type,
+            CreatedAt = variable.CreatedAt,
+            UpdatedAt = variable.UpdatedAt,
         };
     }
 }

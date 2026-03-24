@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { normalizePagedResponse, PagedResponse, QueryParameters } from '../models/paging.model';
 import { RoleListItem, RolePayload } from '../models/role.model';
+import { mapAuditDates } from '../utils/audit-dates';
 import { ApiService } from './api.service';
 import { NotificationService } from './notification.service';
 
@@ -26,25 +27,34 @@ export class RoleService {
       query['filterName'] = filterName;
     }
     return this.api.get<unknown>(RoleService.path, query).pipe(
-      map((raw) =>
-        normalizePagedResponse<RoleListItem>(raw, {
+      map((raw) => {
+        const paged = normalizePagedResponse<RoleListItem>(raw, {
           pageNumber: query['pageNumber'] as number,
           pageSize: query['pageSize'] as number,
-        }),
-      ),
+        });
+        return {
+          ...paged,
+          items: paged.items.map((row) => mapAuditDates(row)),
+        };
+      }),
     );
   }
 
   getAllForDropdown(): Observable<RoleListItem[]> {
-    return this.api.get<RoleListItem[]>(`${RoleService.path}/for-dropdown`);
+    return this.api
+      .get<RoleListItem[]>(`${RoleService.path}/for-dropdown`)
+      .pipe(map((rows) => rows.map((row) => mapAuditDates(row))));
   }
 
   getById(id: number): Observable<RoleListItem> {
-    return this.api.get<RoleListItem>(`${RoleService.path}/${String(id)}`);
+    return this.api
+      .get<RoleListItem>(`${RoleService.path}/${String(id)}`)
+      .pipe(map((row) => mapAuditDates(row)));
   }
 
   create(payload: RolePayload): Observable<RoleListItem> {
     return this.api.post<RoleListItem>(RoleService.path, payload).pipe(
+      map((row) => mapAuditDates(row)),
       tap(() => this.notifications.success('Rol creado correctamente.')),
     );
   }

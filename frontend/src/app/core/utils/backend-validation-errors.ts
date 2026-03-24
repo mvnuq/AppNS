@@ -18,7 +18,6 @@ function toCamelCaseFieldKey(key: string): string {
 
 /**
  * Soporta:
- * - Plano tipo Django: `{ fullName: ["…"], email: ["…"] }`
  * - ASP.NET ValidationProblemDetails: `{ errors: { FullName: ["…"], Email: ["…"] } }`
  */
 export function normalizeFieldValidationErrors(body: unknown): Record<string, string[]> | null {

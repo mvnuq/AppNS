@@ -68,6 +68,16 @@ body {
   background: rgba(15, 23, 42, 0.45);
 }
 
+/* Metadatos: blur explícito (4px) para el diálogo de auditoría */
+.cdk-overlay-backdrop.cdk-overlay-backdrop-showing.metadata-dialog-backdrop {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.metadata-dialog-panel .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+  border-radius: 14px;
+}
+
 /* Diálogos Neosoft */
 .neosoft-dialog .mat-mdc-dialog-container {
   border-radius: 16px !important;

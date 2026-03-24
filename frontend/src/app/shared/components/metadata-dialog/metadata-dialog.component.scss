@@ -1,0 +1,16 @@
+.metadata-dialog__body {
+  padding-top: 8px;
+  min-width: 260px;
+}
+
+.metadata-dialog__label {
+  display: inline-block;
+  min-width: 10rem;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface-variant, #64748b);
+}
+
+.metadata-dialog__never {
+  font-style: italic;
+  color: var(--mat-sys-outline, #94a3b8);
+}

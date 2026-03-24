@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>Detalle</h2>
+<mat-dialog-content class="metadata-dialog__body">
+  <p>
+    <span class="metadata-dialog__label">Creado:</span>
+    {{ data.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+  </p>
+  <p>
+    <span class="metadata-dialog__label">Última actualización:</span>
+    @if (data.updatedAt === null) {
+      <span class="metadata-dialog__never">Nunca</span>
+    } @else {
+      {{ data.updatedAt | date: 'dd/MM/yyyy HH:mm' }}
+    }
+  </p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">Cerrar</button>
+</mat-dialog-actions>

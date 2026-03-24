@@ -13,7 +13,9 @@ public static class UserMappings
             FullName = user.FullName,
             Email = user.Email,
             RoleId = user.RoleId,
-            RoleName = user.Role?.Name ?? string.Empty
+            RoleName = user.Role?.Name ?? string.Empty,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
         };
     }
 }

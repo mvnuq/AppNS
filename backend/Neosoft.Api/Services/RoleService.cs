@@ -17,14 +17,14 @@ public sealed class RoleService(
     public async Task<IReadOnlyList<RoleListItemDto>> GetAllForDropdownAsync(CancellationToken cancellationToken = default)
     {
         var roles = await _roleRepository.GetAllOrderedByNameAsync(cancellationToken);
-        return roles.Select(r => new RoleListItemDto(r.Id, r.Name)).ToList();
+        return roles.Select(r => new RoleListItemDto(r.Id, r.Name, r.CreatedAt, r.UpdatedAt)).ToList();
     }
 
     public async Task<PagedResponse<RoleListItemDto>> GetAllAsync(QueryParameters parameters, CancellationToken cancellationToken = default)
     {
         var query = parameters.Normalized();
         var (items, totalCount) = await _roleRepository.GetPagedAsync(query, cancellationToken);
-        var dtos = items.Select(r => new RoleListItemDto(r.Id, r.Name)).ToList();
+        var dtos = items.Select(r => new RoleListItemDto(r.Id, r.Name, r.CreatedAt, r.UpdatedAt)).ToList();
         var totalPages = query.PageSize <= 0 ? 0 : (int)Math.Ceiling(totalCount / (double)query.PageSize);
         return new PagedResponse<RoleListItemDto>
         {
@@ -37,7 +37,15 @@ public sealed class RoleService(
     public async Task<RoleDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         var role = await _roleRepository.GetByIdReadOnlyAsync(id, cancellationToken);
-        return role is null ? null : new RoleDto { Id = role.Id, Name = role.Name };
+        return role is null
+            ? null
+            : new RoleDto
+            {
+                Id = role.Id,
+                Name = role.Name,
+                CreatedAt = role.CreatedAt,
+                UpdatedAt = role.UpdatedAt,
+            };
     }
 
     public async Task<ServiceResult<RoleDto>> CreateAsync(RoleDto dto, CancellationToken cancellationToken = default)
@@ -52,7 +60,13 @@ public sealed class RoleService(
         await _roleRepository.AddAsync(role, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return ServiceResult<RoleDto>.Ok(new RoleDto { Id = role.Id, Name = role.Name });
+        return ServiceResult<RoleDto>.Ok(new RoleDto
+        {
+            Id = role.Id,
+            Name = role.Name,
+            CreatedAt = role.CreatedAt,
+            UpdatedAt = role.UpdatedAt,
+        });
     }
 
     public async Task<ServiceResult> UpdateAsync(int id, RoleDto dto, CancellationToken cancellationToken = default)

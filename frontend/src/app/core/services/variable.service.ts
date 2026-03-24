@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { normalizePagedResponse, PagedResponse, QueryParameters } from '../models/paging.model';
 import { Variable, VariablePayload } from '../models/variable.model';
+import { mapAuditDates } from '../utils/audit-dates';
 import { ApiService } from './api.service';
 import { NotificationService } from './notification.service';
 
@@ -26,12 +27,16 @@ export class VariableService {
       query['filterName'] = filterName;
     }
     return this.api.get<unknown>(VariableService.path, query).pipe(
-      map((raw) =>
-        normalizePagedResponse<Variable>(raw, {
+      map((raw) => {
+        const paged = normalizePagedResponse<Variable>(raw, {
           pageNumber: query['pageNumber'] as number,
           pageSize: query['pageSize'] as number,
-        }),
-      ),
+        });
+        return {
+          ...paged,
+          items: paged.items.map((row) => mapAuditDates(row)),
+        };
+      }),
     );
   }
 
@@ -40,18 +45,23 @@ export class VariableService {
   }
 
   getById(id: number): Observable<Variable> {
-    return this.api.get<Variable>(`${VariableService.path}/${String(id)}`);
+    return this.api
+      .get<Variable>(`${VariableService.path}/${String(id)}`)
+      .pipe(map((row) => mapAuditDates(row)));
   }
 
   create(payload: VariablePayload): Observable<Variable> {
     return this.api.post<Variable>(VariableService.path, payload).pipe(
+      map((row) => mapAuditDates(row)),
       tap(() => this.notifications.success('Variable creada correctamente.')),
     );
   }
 
   update(id: number, payload: VariablePayload): Observable<void> {
     return this.api.put<void>(`${VariableService.path}/${String(id)}`, payload).pipe(
-      tap(() => this.notifications.success('Variable actualizada correctamente.')),
+      tap(() =>
+        this.notifications.success('Cambio confirmado: la variable se actualizó correctamente.'),
+      ),
     );
   }
 
