@@ -116,11 +116,11 @@ docker compose up --build
 
 #### 1) Base de datos (MariaDB)
 
-Crear base y poblar datos usando `db-init/init.sql`.
+El script de inicialización de base de datos se encuentra en: `db-init/init.sql`.
 
 ```bash
-# ejemplo (ajusta host/puerto/credenciales)
-mysql -h 127.0.0.1 -P 3308 -u root -p < db-init/init.sql
+# script a ejecutar
+db-init/init.sql
 ```
 
 #### 2) Backend (.NET API)
