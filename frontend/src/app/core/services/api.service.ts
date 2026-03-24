@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = environment.apiUrl;
+  private readonly baseUrl = `${environment.apiBaseUrl}/${environment.apiVersion}`;
 
   get<T>(path: string, query?: Record<string, string | number | boolean | undefined | null>): Observable<T> {
     let params = new HttpParams();

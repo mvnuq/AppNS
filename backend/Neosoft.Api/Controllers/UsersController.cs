@@ -6,7 +6,7 @@ using Neosoft.Api.Services;
 namespace Neosoft.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 public class UsersController(IUserService userService) : ControllerBase
 {
     private readonly IUserService _userService = userService;

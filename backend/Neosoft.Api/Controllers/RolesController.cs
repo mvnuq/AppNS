@@ -6,7 +6,7 @@ using Neosoft.Api.Services;
 namespace Neosoft.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 public class RolesController(IRoleService roleService) : ControllerBase
 {
     private readonly IRoleService _roleService = roleService;

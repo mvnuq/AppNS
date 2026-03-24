@@ -6,7 +6,7 @@ using Neosoft.Api.Services;
 namespace Neosoft.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 public class VariablesController(IVariableService variableService) : ControllerBase
 {
     private readonly IVariableService _variableService = variableService;
