@@ -1,6 +1,8 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -14,6 +16,10 @@ import { shareReplay, tap } from 'rxjs/operators';
 import { RoleListItem, RolePayload } from '../../../core/models/role.model';
 import { RoleService } from '../../../core/services/role.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import {
+  applyBackendValidationErrors,
+  getNonFieldErrors,
+} from '../../../core/utils/backend-validation-errors';
 
 export interface RoleFormDialogData {
   readonly mode: 'create' | 'edit';
@@ -39,15 +45,16 @@ interface RoleFormViewModel {
   templateUrl: './role-form.component.html',
   styleUrl: './role-form.component.scss',
 })
-export class RoleFormComponent {
+export class RoleFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly roleService = inject(RoleService);
   private readonly notifications = inject(NotificationService);
   private readonly dialogRef = inject(MatDialogRef<RoleFormComponent, boolean>);
   private readonly data = inject<RoleFormDialogData>(MAT_DIALOG_DATA);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly form = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
+    name: [''],
   });
 
   readonly vm$: Observable<RoleFormViewModel> = defer(() => {
@@ -71,24 +78,42 @@ export class RoleFormComponent {
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
+  ngOnInit(): void {
+    const control = this.form.get('name');
+    if (!control) {
+      return;
+    }
+    control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      if (!control.errors?.['backend']) {
+        return;
+      }
+      const { backend: _b, ...rest } = control.errors as Record<string, unknown>;
+      control.setErrors(Object.keys(rest).length > 0 ? rest : null);
+    });
+  }
+
   submit(vm: RoleFormViewModel): void {
-    if (this.form.invalid || (vm.mode === 'edit' && vm.role === null)) {
-      this.form.markAllAsTouched();
-      this.notifications.warning('Revise los campos marcados antes de guardar.');
+    if (vm.mode === 'edit' && vm.role === null) {
       return;
     }
-    const name = this.form.controls.name.value;
-    if (name === null) {
-      return;
-    }
-    const payload: RolePayload = { name };
+    const payload: RolePayload = { name: this.form.getRawValue().name ?? '' };
+    const handleError = (err: unknown): void => {
+      const body = err instanceof HttpErrorResponse ? err.error : null;
+      applyBackendValidationErrors(this.form, body);
+      const globalMsgs = getNonFieldErrors(body);
+      if (globalMsgs.length > 0) {
+        this.notifications.error(globalMsgs.join(' '));
+      }
+    };
     if (vm.mode === 'create') {
       this.roleService.create(payload).subscribe({
         next: () => this.dialogRef.close(true),
+        error: handleError,
       });
     } else if (vm.role !== null) {
       this.roleService.update(vm.role.id, payload).subscribe({
         next: () => this.dialogRef.close(true),
+        error: handleError,
       });
     }
   }

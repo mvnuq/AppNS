@@ -1,6 +1,8 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -17,6 +19,10 @@ import { RoleListItem } from '../../../core/models/role.model';
 import { RoleService } from '../../../core/services/role.service';
 import { UserService } from '../../../core/services/user.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import {
+  applyBackendValidationErrors,
+  getNonFieldErrors,
+} from '../../../core/utils/backend-validation-errors';
 
 export interface UserFormDialogData {
   readonly mode: 'create' | 'edit';
@@ -44,18 +50,19 @@ interface UserFormViewModel {
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.scss',
 })
-export class UserFormComponent {
+export class UserFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly userService = inject(UserService);
   private readonly roleService = inject(RoleService);
   private readonly notifications = inject(NotificationService);
   private readonly dialogRef = inject(MatDialogRef<UserFormComponent, boolean>);
   private readonly data = inject<UserFormDialogData>(MAT_DIALOG_DATA);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly form = this.fb.group({
-    fullName: ['', [Validators.required, Validators.minLength(3)]],
-    email: ['', [Validators.required, Validators.email]],
-    roleId: [null as number | null, Validators.required],
+    fullName: [''],
+    email: [''],
+    roleId: [null as number | null],
   });
 
   readonly vm$: Observable<UserFormViewModel> = defer(() => {
@@ -86,29 +93,49 @@ export class UserFormComponent {
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
+  ngOnInit(): void {
+    for (const key of ['fullName', 'email', 'roleId'] as const) {
+      const control = this.form.get(key);
+      if (!control) {
+        continue;
+      }
+      control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+        if (!control.errors?.['backend']) {
+          return;
+        }
+        const { backend: _b, ...rest } = control.errors as Record<string, unknown>;
+        control.setErrors(Object.keys(rest).length > 0 ? rest : null);
+      });
+    }
+  }
+
   submit(vm: UserFormViewModel): void {
-    if (this.form.invalid || (vm.mode === 'edit' && vm.user === null)) {
-      this.form.markAllAsTouched();
-      this.notifications.warning('Revise los campos marcados antes de guardar.');
+    if (vm.mode === 'edit' && vm.user === null) {
       return;
     }
     const raw = this.form.getRawValue();
-    const { fullName, email, roleId } = raw;
-    if (fullName === null || email === null || roleId === null) {
-      return;
-    }
     const payload: UserCreatePayload = {
-      fullName,
-      email,
-      roleId,
+      fullName: raw.fullName ?? '',
+      email: raw.email ?? '',
+      roleId: raw.roleId ?? 0,
+    };
+    const handleError = (err: unknown): void => {
+      const body = err instanceof HttpErrorResponse ? err.error : null;
+      applyBackendValidationErrors(this.form, body);
+      const globalMsgs = getNonFieldErrors(body);
+      if (globalMsgs.length > 0) {
+        this.notifications.error(globalMsgs.join(' '));
+      }
     };
     if (vm.mode === 'create') {
       this.userService.create(payload).subscribe({
         next: () => this.dialogRef.close(true),
+        error: handleError,
       });
     } else if (vm.user !== null) {
       this.userService.update(vm.user.id, payload).subscribe({
         next: () => this.dialogRef.close(true),
+        error: handleError,
       });
     }
   }

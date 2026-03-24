@@ -5,26 +5,20 @@
     @if (vm.mode === 'edit' && vm.user === null) {
       <p class="error-text">No se encontró el usuario solicitado.</p>
     } @else {
-      <form id="userForm" class="form" [formGroup]="form" (ngSubmit)="submit(vm)">
+      <form id="userForm" class="form" novalidate [formGroup]="form" (ngSubmit)="submit(vm)">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Nombre completo</mat-label>
           <input matInput formControlName="fullName" autocomplete="name" />
-          @if (form.controls.fullName.hasError('required') && form.controls.fullName.touched) {
-            <mat-error>El nombre es obligatorio.</mat-error>
-          }
-          @if (form.controls.fullName.hasError('minlength') && form.controls.fullName.touched) {
-            <mat-error>Mínimo 3 caracteres.</mat-error>
+          @if (form.controls.fullName.errors?.['backend']) {
+            <mat-error>{{ form.controls.fullName.getError('backend') }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Correo electrónico</mat-label>
-          <input matInput type="email" formControlName="email" autocomplete="email" />
-          @if (form.controls.email.hasError('required') && form.controls.email.touched) {
-            <mat-error>El correo es obligatorio.</mat-error>
-          }
-          @if (form.controls.email.hasError('email') && form.controls.email.touched) {
-            <mat-error>Introduzca un correo válido.</mat-error>
+          <input matInput type="text" formControlName="email" autocomplete="email" />
+          @if (form.controls.email.errors?.['backend']) {
+            <mat-error>{{ form.controls.email.getError('backend') }}</mat-error>
           }
         </mat-form-field>
 
@@ -35,8 +29,8 @@
               <mat-option [value]="role.id">{{ role.name }}</mat-option>
             }
           </mat-select>
-          @if (form.controls.roleId.hasError('required') && form.controls.roleId.touched) {
-            <mat-error>Seleccione un rol.</mat-error>
+          @if (form.controls.roleId.errors?.['backend']) {
+            <mat-error>{{ form.controls.roleId.getError('backend') }}</mat-error>
           }
         </mat-form-field>
       </form>
@@ -46,7 +40,7 @@
   <mat-dialog-actions align="end" class="dialog-actions">
     <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
     @if (!(vm.mode === 'edit' && vm.user === null)) {
-      <button mat-flat-button color="primary" type="submit" form="userForm" [disabled]="form.invalid">
+      <button mat-flat-button color="primary" type="submit" form="userForm">
         Guardar
       </button>
     }

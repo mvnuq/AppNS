@@ -5,23 +5,20 @@
     @if (vm.mode === 'edit' && vm.variable === null) {
       <p class="error-text">No se encontró la variable solicitada.</p>
     } @else {
-      <form id="variableForm" class="form" [formGroup]="form" (ngSubmit)="submit(vm)">
+      <form id="variableForm" class="form" novalidate [formGroup]="form" (ngSubmit)="submit(vm)">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Nombre</mat-label>
           <input matInput formControlName="name" />
-          @if (form.controls.name.hasError('required') && form.controls.name.touched) {
-            <mat-error>El nombre es obligatorio.</mat-error>
-          }
-          @if (form.controls.name.hasError('minlength') && form.controls.name.touched) {
-            <mat-error>Mínimo 2 caracteres.</mat-error>
+          @if (form.controls.name.errors?.['backend']) {
+            <mat-error>{{ form.controls.name.getError('backend') }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Valor</mat-label>
           <input matInput formControlName="value" />
-          @if (form.controls.value.hasError('required') && form.controls.value.touched) {
-            <mat-error>El valor es obligatorio.</mat-error>
+          @if (form.controls.value.errors?.['backend']) {
+            <mat-error>{{ form.controls.value.getError('backend') }}</mat-error>
           }
         </mat-form-field>
 
@@ -32,8 +29,8 @@
               <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
             }
           </mat-select>
-          @if (form.controls.type.hasError('required') && form.controls.type.touched) {
-            <mat-error>Seleccione un tipo.</mat-error>
+          @if (form.controls.type.errors?.['backend']) {
+            <mat-error>{{ form.controls.type.getError('backend') }}</mat-error>
           }
         </mat-form-field>
       </form>
@@ -43,7 +40,7 @@
   <mat-dialog-actions align="end" class="dialog-actions">
     <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
     @if (!(vm.mode === 'edit' && vm.variable === null)) {
-      <button mat-flat-button color="primary" type="submit" form="variableForm" [disabled]="form.invalid">
+      <button mat-flat-button color="primary" type="submit" form="variableForm">
         Guardar
       </button>
     }

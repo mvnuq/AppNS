@@ -23,7 +23,8 @@ public static class ServiceResultExtensions
         return result.ErrorKind switch
         {
             ServiceErrorKind.NotFound => controller.NotFound(),
-            _ => controller.BadRequest(result.Error)
+            ServiceErrorKind.Validation => controller.BadRequest(BuildValidationBody(result)),
+            _ => controller.BadRequest(result.Error),
         };
     }
 
@@ -32,7 +33,36 @@ public static class ServiceResultExtensions
         return result.ErrorKind switch
         {
             ServiceErrorKind.NotFound => controller.NotFound(),
-            _ => controller.BadRequest(result.Error)
+            ServiceErrorKind.Validation => controller.BadRequest(BuildValidationBody(result)),
+            _ => controller.BadRequest(result.Error),
+        };
+    }
+
+    private static Dictionary<string, string[]> BuildValidationBody(ServiceResult result)
+    {
+        if (result.FieldErrors is { Count: > 0 })
+        {
+            return new Dictionary<string, string[]>(result.FieldErrors, StringComparer.Ordinal);
+        }
+
+        var msg = result.Error ?? "Error de validación.";
+        return new Dictionary<string, string[]>(StringComparer.Ordinal)
+        {
+            ["non_field_errors"] = [msg],
+        };
+    }
+
+    private static Dictionary<string, string[]> BuildValidationBody<T>(ServiceResult<T> result)
+    {
+        if (result.FieldErrors is { Count: > 0 })
+        {
+            return new Dictionary<string, string[]>(result.FieldErrors, StringComparer.Ordinal);
+        }
+
+        var msg = result.Error ?? "Error de validación.";
+        return new Dictionary<string, string[]>(StringComparer.Ordinal)
+        {
+            ["non_field_errors"] = [msg],
         };
     }
 }

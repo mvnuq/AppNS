@@ -1,7 +1,9 @@
 using DotNetEnv;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Neosoft.Api.Common;
 using Neosoft.Api.Data;
 using Neosoft.Api.DependencyInjection;
 using Neosoft.Api.Validation;
@@ -21,6 +23,10 @@ builder.Services.AddControllers()
     {
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
     });
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = ModelStateValidationResponse.FromModelState;
+});
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<UserCreateDtoValidator>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

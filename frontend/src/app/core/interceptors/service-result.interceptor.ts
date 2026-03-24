@@ -14,7 +14,9 @@ export const serviceResultInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: unknown) => {
       if (error instanceof HttpErrorResponse) {
         const message = extractHttpErrorMessage(error);
-        notifications.error(message);
+        if (message !== null && message !== '') {
+          notifications.error(message);
+        }
       }
       return throwError(() => error);
     }),

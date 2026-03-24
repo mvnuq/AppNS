@@ -32,7 +32,10 @@ public sealed class UserService(
     {
         if (!await _roleRepository.ExistsAsync(dto.RoleId, cancellationToken))
         {
-            return ServiceResult<UserDto>.Validation("El rol indicado no existe.");
+            return ServiceResult<UserDto>.Validation(new Dictionary<string, string[]>
+            {
+                ["roleId"] = ["El rol indicado no existe."],
+            });
         }
 
         var user = new User
@@ -64,7 +67,10 @@ public sealed class UserService(
 
         if (!await _roleRepository.ExistsAsync(dto.RoleId, cancellationToken))
         {
-            return ServiceResult.Validation("El rol indicado no existe.");
+            return ServiceResult.Validation(new Dictionary<string, string[]>
+            {
+                ["roleId"] = ["El rol indicado no existe."],
+            });
         }
 
         user.FullName = dto.FullName;

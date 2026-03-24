@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Neosoft.Api.Data;
@@ -42,6 +43,42 @@ public sealed class UsersApiIntegrationTests : IClassFixture<ApiFactory>
             });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+        Assert.True(doc.RootElement.TryGetProperty("roleId", out var roleErr));
+        Assert.Equal(JsonValueKind.Array, roleErr.ValueKind);
+        Assert.True(roleErr.GetArrayLength() > 0);
+    }
+
+    [Fact]
+    public async Task Post_usuario_devuelve_400_y_mensajes_por_campo_si_email_invalido()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await db.Database.EnsureDeletedAsync();
+        await db.Database.EnsureCreatedAsync();
+
+        db.Roles.Add(new Role { Name = "Admin" });
+        await db.SaveChangesAsync();
+        var roleId = await db.Roles.Select(r => r.Id).FirstAsync();
+
+        var client = _factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync(
+            "/api/users",
+            new
+            {
+                fullName = "Usuario Test",
+                email = "no-es-correo",
+                roleId = roleId,
+            });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+        Assert.True(doc.RootElement.TryGetProperty("email", out var emailErr));
+        Assert.Equal(JsonValueKind.Array, emailErr.ValueKind);
+        Assert.Contains("correo", emailErr[0].GetString(), StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
