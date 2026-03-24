@@ -38,7 +38,6 @@ export function normalizeFieldValidationErrors(body: unknown): Record<string, st
   }
 
   const metaKeys = new Set([
-    'type',
     'title',
     'status',
     'detail',

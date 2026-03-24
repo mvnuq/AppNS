@@ -48,9 +48,20 @@ public sealed class VariableService(
 
     public async Task<ServiceResult<VariableDto>> CreateAsync(VariableDto dto, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(dto.Type))
+        {
+            return ServiceResult<VariableDto>.Validation(new Dictionary<string, string[]>
+            {
+                ["type"] = ["El tipo es obligatorio."]
+            });
+        }
+
         if (!VariableType.IsValid(dto.Type))
         {
-            return ServiceResult<VariableDto>.Validation("El tipo debe ser texto, numérico o booleano.");
+            return ServiceResult<VariableDto>.Validation(new Dictionary<string, string[]>
+            {
+                ["type"] = ["El tipo debe ser texto, numérico o booleano."]
+            });
         }
 
         var variable = new Variable
@@ -74,9 +85,20 @@ public sealed class VariableService(
             return ServiceResult.NotFound();
         }
 
+        if (string.IsNullOrWhiteSpace(dto.Type))
+        {
+            return ServiceResult.Validation(new Dictionary<string, string[]>
+            {
+                ["type"] = ["El tipo es obligatorio."]
+            });
+        }
+
         if (!VariableType.IsValid(dto.Type))
         {
-            return ServiceResult.Validation("El tipo debe ser texto, numérico o booleano.");
+            return ServiceResult.Validation(new Dictionary<string, string[]>
+            {
+                ["type"] = ["El tipo debe ser texto, numérico o booleano."]
+            });
         }
 
         variable.Name = dto.Name;
