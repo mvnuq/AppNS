@@ -1,0 +1,46 @@
+services:
+  db:
+    image: mariadb:11.4
+    container_name: neosoft-db
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-${MYSQL_ROOT_PASSWORD:-root123}}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-${MYSQL_DATABASE:-neosoft_db}}
+    ports:
+      - "3308:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -p$${MARIADB_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend/Neosoft.Api
+      dockerfile: Dockerfile
+    container_name: neosoft-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Server=db;Port=3306;Database=${MARIADB_DATABASE:-${MYSQL_DATABASE:-neosoft_db}};User Id=root;Password=${MARIADB_ROOT_PASSWORD:-${MYSQL_ROOT_PASSWORD:-root123}};
+    ports:
+      - "5106:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: neosoft-frontend
+    depends_on:
+      - backend
+    ports:
+      - "4200:4200"
+
+volumes:
+  mariadb_data:

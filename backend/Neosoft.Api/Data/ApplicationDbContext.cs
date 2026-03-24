@@ -22,6 +22,17 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(e => e.FullName).HasColumnName("full_name").IsRequired();
             entity.Property(e => e.Email).HasColumnName("email").IsRequired();
             entity.Property(e => e.RoleId).HasColumnName("role_id");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .ValueGeneratedOnAddOrUpdate();
+            entity.Property(e => e.IsDeleted)
+                .HasColumnName("is_deleted")
+                .HasDefaultValue(false);
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
 
             entity.HasOne(e => e.Role)
                 .WithMany(r => r.Users)

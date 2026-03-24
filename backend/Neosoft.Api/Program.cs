@@ -45,7 +45,12 @@ else
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             throw new InvalidOperationException(
-                "Falta ConnectionStrings:DefaultConnection. Copia .env.example como .env y configura MySQL.");
+                "Falta ConnectionStrings:DefaultConnection. Copia .env.example como .env y configura MariaDB.");
+        }
+
+        if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+        {
+            connectionString = EnsureDbServiceHost(connectionString);
         }
 
         options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
@@ -67,6 +72,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -82,5 +94,34 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static string EnsureDbServiceHost(string connectionString)
+{
+    var parts = connectionString
+        .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .ToList();
+
+    for (var i = 0; i < parts.Count; i++)
+    {
+        var kv = parts[i].Split('=', 2, StringSplitOptions.TrimEntries);
+        if (kv.Length != 2)
+        {
+            continue;
+        }
+
+        var key = kv[0];
+        var value = kv[1];
+        if ((key.Equals("Server", StringComparison.OrdinalIgnoreCase) ||
+             key.Equals("Host", StringComparison.OrdinalIgnoreCase) ||
+             key.Equals("Data Source", StringComparison.OrdinalIgnoreCase)) &&
+            (value.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+             value.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase)))
+        {
+            parts[i] = $"{key}=db";
+        }
+    }
+
+    return string.Join(';', parts) + ";";
+}
 
 public partial class Program;
