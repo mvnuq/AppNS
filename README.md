@@ -88,19 +88,26 @@ Levanta **DB + API + Frontend** con una sola instrucción, incluyendo inicializa
 
 Prerequisito recomendado: tener **Docker Desktop** instalado y ejecutándose para simplificar la gestión de contenedores en entorno local.
 
-1) (Opcional) Crear `.env` raíz desde el ejemplo:
+1) Clonar el repositorio y entrar al proyecto:
+
+```bash
+git clone https://github.com/mvnuq/AppNS.git
+cd AppNS
+```
+
+2) (Opcional) Crear `.env` raíz desde el ejemplo:
 
 ```bash
 cp .env.docker.example .env
 ```
 
-2) Ejecutar stack completo:
+3) Ejecutar stack completo:
 
 ```bash
 docker compose up --build
 ```
 
-3) Accesos:
+4) Accesos:
 - Frontend: `http://localhost:4200`
 - API: `http://localhost:5106/api/v1`
 - DB MariaDB: `localhost:3308`
