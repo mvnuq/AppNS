@@ -9,8 +9,7 @@ services:
     ports:
       - "3308:3306"
     volumes:
-      - ./db-init:/docker-entrypoint-initdb.d 
-      - ./database:/docker-entrypoint-initdb.d/database
+      - ./db-init:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -p$${MARIADB_ROOT_PASSWORD}"]
       interval: 5s
