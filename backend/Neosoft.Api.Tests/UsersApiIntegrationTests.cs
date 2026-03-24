@@ -106,4 +106,40 @@ public sealed class UsersApiIntegrationTests : IClassFixture<ApiFactory>
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Get_usuarios_con_filterId_devuelve_paginado_y_solo_el_usuario_filtrado()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await db.Database.EnsureDeletedAsync();
+        await db.Database.EnsureCreatedAsync();
+
+        db.Roles.Add(new Role { Name = "Admin" });
+        await db.SaveChangesAsync();
+        var roleId = await db.Roles.Select(r => r.Id).FirstAsync();
+
+        for (var i = 0; i < 3; i++)
+        {
+            db.Users.Add(new User { FullName = $"Usuario {i}", Email = $"u{i}@test.com", RoleId = roleId });
+        }
+
+        await db.SaveChangesAsync();
+
+        var targetId = await db.Users.OrderBy(u => u.Id).Skip(1).Select(u => u.Id).FirstAsync();
+
+        var client = _factory.CreateClient();
+        var response = await client.GetAsync($"/api/users?pageNumber=1&pageSize=10&filterId={targetId}");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+        Assert.Equal(JsonValueKind.Object, doc.RootElement.ValueKind);
+        Assert.True(doc.RootElement.TryGetProperty("items", out var items));
+        Assert.Equal(1, items.GetArrayLength());
+        Assert.Equal(targetId, items[0].GetProperty("id").GetInt32());
+        Assert.True(doc.RootElement.TryGetProperty("totalCount", out var totalCount));
+        Assert.Equal(1, totalCount.GetInt32());
+    }
 }

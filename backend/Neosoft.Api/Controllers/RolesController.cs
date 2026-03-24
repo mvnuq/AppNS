@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Neosoft.Api.Models;
 using Neosoft.Api.Models.DTOs;
 using Neosoft.Api.Services;
 
@@ -10,11 +11,20 @@ public class RolesController(IRoleService roleService) : ControllerBase
 {
     private readonly IRoleService _roleService = roleService;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<RoleListItemDto>>> Get(CancellationToken cancellationToken)
+    [HttpGet("for-dropdown")]
+    public async Task<ActionResult<IEnumerable<RoleListItemDto>>> GetForDropdown(CancellationToken cancellationToken)
     {
         var roles = await _roleService.GetAllForDropdownAsync(cancellationToken);
         return Ok(roles);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<PagedResponse<RoleListItemDto>>> Get(
+        [FromQuery] QueryParameters? parameters,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _roleService.GetAllAsync(parameters ?? new QueryParameters(), cancellationToken);
+        return Ok(result);
     }
 
     [HttpGet("{id:int}")]

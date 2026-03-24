@@ -4,6 +4,7 @@ using Neosoft.Api.Mapping;
 using Neosoft.Api.Models;
 using Neosoft.Api.Models.DTOs;
 using Neosoft.Api.Models.Entities;
+using Neosoft.Api.Querying;
 using Neosoft.Api.Repositories;
 
 namespace Neosoft.Api.Services;
@@ -19,6 +20,24 @@ public sealed class VariableService(
     {
         var variables = await _variableRepository.GetAllAsync(cancellationToken);
         return variables.Select(v => v.ToDto()).ToList();
+    }
+
+    /// <summary>
+    /// Listado paginado. Filtros ID/nombre antes de paginar
+    /// (<see cref="PagedQueryableExtensions.ApplyVariablePagedFilters"/> vía repositorio).
+    /// </summary>
+    public async Task<PagedResponse<VariableDto>> GetAllAsync(QueryParameters parameters, CancellationToken cancellationToken = default)
+    {
+        var query = parameters.Normalized();
+        var (items, totalCount) = await _variableRepository.GetPagedAsync(query, cancellationToken);
+        var dtos = items.Select(v => v.ToDto()).ToList();
+        var totalPages = query.PageSize <= 0 ? 0 : (int)Math.Ceiling(totalCount / (double)query.PageSize);
+        return new PagedResponse<VariableDto>
+        {
+            Items = dtos,
+            TotalCount = totalCount,
+            TotalPages = totalPages,
+        };
     }
 
     public async Task<VariableDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)

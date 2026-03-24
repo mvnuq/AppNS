@@ -23,3 +23,23 @@
     margin-right: 8px;
   }
 }
+
+.table-area {
+  position: relative;
+  min-height: 160px;
+}
+
+.table-area--loading {
+  pointer-events: none;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--mat-sys-surface, #fff) 72%, transparent);
+  border-radius: 8px;
+}

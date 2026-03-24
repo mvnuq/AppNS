@@ -1,6 +1,55 @@
+@if (showToolbar) {
+  <div class="table-toolbar">
+    @if (toolbarMode === 'idName') {
+      <mat-form-field appearance="outline" class="filter-field filter-field--id" subscriptSizing="dynamic">
+        <mat-label>Buscar por ID</mat-label>
+        <input
+          matInput
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          autocomplete="off"
+          placeholder="Ej. 11"
+          [formControl]="idFilterControl"
+        />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field filter-field--name" subscriptSizing="dynamic">
+        <mat-label>Buscar por nombre</mat-label>
+        <span matPrefix class="search-prefix">
+          <mat-icon>person</mat-icon>
+        </span>
+        <input
+          matInput
+          type="text"
+          autocomplete="off"
+          [formControl]="nameFilterControl"
+          placeholder="Filtrar por nombre"
+        />
+      </mat-form-field>
+    } @else {
+      <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+        <mat-label>{{ searchLabel }}</mat-label>
+        <span matPrefix class="search-prefix">
+          <mat-icon>search</mat-icon>
+        </span>
+        <input matInput type="search" [formControl]="searchControl" [placeholder]="searchPlaceholder" />
+      </mat-form-field>
+    }
+  </div>
+}
 <div class="table-wrap">
   <ng-content />
   @if (empty) {
     <p class="empty">{{ emptyMessage }}</p>
   }
 </div>
+@if (showToolbar) {
+  <mat-paginator
+    [length]="length"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    [showFirstLastButtons]="true"
+    (page)="pageChange.emit($event)"
+  />
+}

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
+import { normalizePagedResponse, PagedResponse, QueryParameters } from '../models/paging.model';
 import { RoleListItem, RolePayload } from '../models/role.model';
 import { ApiService } from './api.service';
 import { NotificationService } from './notification.service';
@@ -11,8 +12,31 @@ export class RoleService {
   private readonly notifications = inject(NotificationService);
   private static readonly path = '/roles';
 
+  getPaged(params?: Partial<QueryParameters>): Observable<PagedResponse<RoleListItem>> {
+    const query: Record<string, string | number> = {
+      pageNumber: params?.pageNumber ?? 1,
+      pageSize: params?.pageSize ?? 10,
+    };
+    const filterId = params?.filterId;
+    if (filterId != null && filterId > 0) {
+      query['filterId'] = filterId;
+    }
+    const filterName = params?.filterName?.trim();
+    if (filterName) {
+      query['filterName'] = filterName;
+    }
+    return this.api.get<unknown>(RoleService.path, query).pipe(
+      map((raw) =>
+        normalizePagedResponse<RoleListItem>(raw, {
+          pageNumber: query['pageNumber'] as number,
+          pageSize: query['pageSize'] as number,
+        }),
+      ),
+    );
+  }
+
   getAllForDropdown(): Observable<RoleListItem[]> {
-    return this.api.get<RoleListItem[]>(RoleService.path);
+    return this.api.get<RoleListItem[]>(`${RoleService.path}/for-dropdown`);
   }
 
   getById(id: number): Observable<RoleListItem> {

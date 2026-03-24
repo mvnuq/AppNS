@@ -1,5 +1,6 @@
 using Neosoft.Api.Common;
 using Neosoft.Api.Data;
+using Neosoft.Api.Models;
 using Neosoft.Api.Models.DTOs;
 using Neosoft.Api.Models.Entities;
 using Neosoft.Api.Repositories;
@@ -17,6 +18,20 @@ public sealed class RoleService(
     {
         var roles = await _roleRepository.GetAllOrderedByNameAsync(cancellationToken);
         return roles.Select(r => new RoleListItemDto(r.Id, r.Name)).ToList();
+    }
+
+    public async Task<PagedResponse<RoleListItemDto>> GetAllAsync(QueryParameters parameters, CancellationToken cancellationToken = default)
+    {
+        var query = parameters.Normalized();
+        var (items, totalCount) = await _roleRepository.GetPagedAsync(query, cancellationToken);
+        var dtos = items.Select(r => new RoleListItemDto(r.Id, r.Name)).ToList();
+        var totalPages = query.PageSize <= 0 ? 0 : (int)Math.Ceiling(totalCount / (double)query.PageSize);
+        return new PagedResponse<RoleListItemDto>
+        {
+            Items = dtos,
+            TotalCount = totalCount,
+            TotalPages = totalPages,
+        };
     }
 
     public async Task<RoleDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)

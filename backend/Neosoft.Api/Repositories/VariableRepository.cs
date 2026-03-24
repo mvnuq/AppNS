@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Neosoft.Api.Data;
+using Neosoft.Api.Models;
 using Neosoft.Api.Models.Entities;
+using Neosoft.Api.Querying;
 
 namespace Neosoft.Api.Repositories;
 
@@ -14,6 +16,35 @@ public sealed class VariableRepository(ApplicationDbContext context) : IVariable
             .AsNoTracking()
             .OrderBy(v => v.Id)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<(IReadOnlyList<Variable> Items, int TotalCount)> GetPagedAsync(
+        QueryParameters parameters,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Variables.AsNoTracking().AsQueryable().ApplyVariablePagedFilters(parameters);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var pageIds = await query
+            .OrderBy(v => v.Id)
+            .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+            .Take(parameters.PageSize)
+            .Select(v => v.Id)
+            .ToListAsync(cancellationToken);
+
+        if (pageIds.Count == 0)
+        {
+            return (Array.Empty<Variable>(), totalCount);
+        }
+
+        var items = await _context.Variables
+            .AsNoTracking()
+            .Where(v => pageIds.Contains(v.Id))
+            .OrderBy(v => v.Id)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 
     public async Task<Variable?> GetByIdReadOnlyAsync(int id, CancellationToken cancellationToken = default)

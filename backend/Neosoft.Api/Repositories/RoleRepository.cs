@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Neosoft.Api.Data;
+using Neosoft.Api.Models;
 using Neosoft.Api.Models.Entities;
+using Neosoft.Api.Querying;
 
 namespace Neosoft.Api.Repositories;
 
@@ -17,6 +19,24 @@ public sealed class RoleRepository(ApplicationDbContext context) : IRoleReposito
             .AsNoTracking()
             .OrderBy(r => r.Name)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<(IReadOnlyList<Role> Items, int TotalCount)> GetPagedAsync(
+        QueryParameters parameters,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Roles.AsNoTracking().AsQueryable().ApplyRolePagedFilters(parameters);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderBy(r => r.Name)
+            .ThenBy(r => r.Id)
+            .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+            .Take(parameters.PageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 
     public async Task<Role?> GetByIdReadOnlyAsync(int id, CancellationToken cancellationToken = default)

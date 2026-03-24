@@ -1,4 +1,5 @@
 using Neosoft.Api.Common;
+using Neosoft.Api.Models;
 using Neosoft.Api.Models.DTOs;
 
 namespace Neosoft.Api.Services;
@@ -6,6 +7,8 @@ namespace Neosoft.Api.Services;
 public interface IVariableService
 {
     Task<IReadOnlyList<VariableDto>> GetAllAsync(CancellationToken cancellationToken = default);
+
+    Task<PagedResponse<VariableDto>> GetAllAsync(QueryParameters parameters, CancellationToken cancellationToken = default);
 
     Task<VariableDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 

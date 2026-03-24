@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Neosoft.Api.Models;
 using Neosoft.Api.Models.DTOs;
 using Neosoft.Api.Services;
 
@@ -11,9 +12,11 @@ public class UsersController(IUserService userService) : ControllerBase
     private readonly IUserService _userService = userService;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDto>>> Get(CancellationToken cancellationToken)
+    public async Task<ActionResult<PagedResponse<UserDto>>> Get(
+        [FromQuery] QueryParameters? parameters,
+        CancellationToken cancellationToken = default)
     {
-        var users = await _userService.GetAllAsync(cancellationToken);
+        var users = await _userService.GetAllAsync(parameters ?? new QueryParameters(), cancellationToken);
         return Ok(users);
     }
 

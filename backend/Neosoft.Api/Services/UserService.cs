@@ -1,8 +1,10 @@
 using Neosoft.Api.Common;
 using Neosoft.Api.Data;
 using Neosoft.Api.Mapping;
+using Neosoft.Api.Models;
 using Neosoft.Api.Models.DTOs;
 using Neosoft.Api.Models.Entities;
+using Neosoft.Api.Querying;
 using Neosoft.Api.Repositories;
 
 namespace Neosoft.Api.Services;
@@ -20,6 +22,24 @@ public sealed class UserService(
     {
         var users = await _userRepository.GetAllWithRoleAsync(cancellationToken);
         return users.Select(u => u.ToDto()).ToList();
+    }
+
+    /// <summary>
+    /// Listado paginado. Los filtros se aplican sobre <c>IQueryable</c> antes de paginar
+    /// (<see cref="PagedQueryableExtensions.ApplyUserPagedFilters"/> vía repositorio).
+    /// </summary>
+    public async Task<PagedResponse<UserDto>> GetAllAsync(QueryParameters parameters, CancellationToken cancellationToken = default)
+    {
+        var query = parameters.Normalized();
+        var (items, totalCount) = await _userRepository.GetPagedWithRoleAsync(query, cancellationToken);
+        var dtos = items.Select(u => u.ToDto()).ToList();
+        var totalPages = query.PageSize <= 0 ? 0 : (int)Math.Ceiling(totalCount / (double)query.PageSize);
+        return new PagedResponse<UserDto>
+        {
+            Items = dtos,
+            TotalCount = totalCount,
+            TotalPages = totalPages,
+        };
     }
 
     public async Task<UserDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)

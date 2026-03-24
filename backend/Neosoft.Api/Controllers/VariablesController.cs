@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Neosoft.Api.Models;
 using Neosoft.Api.Models.DTOs;
 using Neosoft.Api.Services;
 
@@ -11,9 +12,11 @@ public class VariablesController(IVariableService variableService) : ControllerB
     private readonly IVariableService _variableService = variableService;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<VariableDto>>> Get(CancellationToken cancellationToken)
+    public async Task<ActionResult<PagedResponse<VariableDto>>> Get(
+        [FromQuery] QueryParameters? parameters,
+        CancellationToken cancellationToken = default)
     {
-        var variables = await _variableService.GetAllAsync(cancellationToken);
+        var variables = await _variableService.GetAllAsync(parameters ?? new QueryParameters(), cancellationToken);
         return Ok(variables);
     }
 

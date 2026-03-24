@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
+import { normalizePagedResponse, PagedResponse, QueryParameters } from '../models/paging.model';
 import { Variable, VariablePayload } from '../models/variable.model';
 import { ApiService } from './api.service';
 import { NotificationService } from './notification.service';
@@ -11,8 +12,31 @@ export class VariableService {
   private readonly notifications = inject(NotificationService);
   private static readonly path = '/variables';
 
+  getPaged(params?: Partial<QueryParameters>): Observable<PagedResponse<Variable>> {
+    const query: Record<string, string | number> = {
+      pageNumber: params?.pageNumber ?? 1,
+      pageSize: params?.pageSize ?? 10,
+    };
+    const filterId = params?.filterId;
+    if (filterId != null && filterId > 0) {
+      query['filterId'] = filterId;
+    }
+    const filterName = params?.filterName?.trim();
+    if (filterName) {
+      query['filterName'] = filterName;
+    }
+    return this.api.get<unknown>(VariableService.path, query).pipe(
+      map((raw) =>
+        normalizePagedResponse<Variable>(raw, {
+          pageNumber: query['pageNumber'] as number,
+          pageSize: query['pageSize'] as number,
+        }),
+      ),
+    );
+  }
+
   getAll(): Observable<Variable[]> {
-    return this.api.get<Variable[]>(VariableService.path);
+    return this.getPaged().pipe(map((r) => r.items));
   }
 
   getById(id: number): Observable<Variable> {

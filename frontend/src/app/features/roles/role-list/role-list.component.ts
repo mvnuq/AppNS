@@ -1,14 +1,15 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { PageEvent } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { catchError, Observable, of, Subject, switchMap } from 'rxjs';
-import { startWith } from 'rxjs/operators';
+import { DEFAULT_PAGED_QUERY, IdNameFilters } from '../../../core/models/paging.model';
 import { RoleListItem } from '../../../core/models/role.model';
+import { createPagedListResource } from '../../../core/paged-list/create-paged-list-resource';
 import { RoleService } from '../../../core/services/role.service';
 import { listFadeIn, rowAnimation } from '../../../shared/animations/list.animations';
 import {
@@ -25,13 +26,13 @@ import {
   selector: 'app-role-list',
   standalone: true,
   imports: [
-    AsyncPipe,
     MaintainerTableComponent,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
     MatTooltipModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './role-list.component.html',
   styleUrl: './role-list.component.scss',
@@ -40,7 +41,11 @@ import {
 export class RoleListComponent {
   private readonly roleService = inject(RoleService);
   private readonly dialog = inject(MatDialog);
-  private readonly refresh$ = new Subject<void>();
+
+  readonly paged = createPagedListResource<RoleListItem>(
+    (params) => this.roleService.getPaged(params),
+    DEFAULT_PAGED_QUERY,
+  );
 
   private static readonly formDialogConfig = {
     width: '440px',
@@ -51,17 +56,16 @@ export class RoleListComponent {
 
   readonly displayedColumns: readonly string[] = ['id', 'name', 'actions'];
 
-  readonly roles$: Observable<RoleListItem[]> = this.refresh$.pipe(
-    startWith(undefined),
-    switchMap(() =>
-      this.roleService.getAllForDropdown().pipe(
-        catchError(() => of([] as RoleListItem[])),
-      ),
-    ),
-  );
-
   trackByRoleId(_index: number, role: RoleListItem): number {
     return role.id;
+  }
+
+  onFiltersChange(filters: IdNameFilters): void {
+    this.paged.applyFilters(filters);
+  }
+
+  onPage(event: PageEvent): void {
+    this.paged.applyPage(event);
   }
 
   openCreate(): void {
@@ -74,7 +78,7 @@ export class RoleListComponent {
       .afterClosed()
       .subscribe((saved: boolean | undefined) => {
         if (saved === true) {
-          this.refresh$.next();
+          this.paged.refresh();
         }
       });
   }
@@ -89,7 +93,7 @@ export class RoleListComponent {
       .afterClosed()
       .subscribe((saved: boolean | undefined) => {
         if (saved === true) {
-          this.refresh$.next();
+          this.paged.refresh();
         }
       });
   }
@@ -108,7 +112,7 @@ export class RoleListComponent {
     ref.afterClosed().subscribe((confirmed: boolean | undefined) => {
       if (confirmed === true) {
         this.roleService.delete(role.id).subscribe({
-          next: () => this.refresh$.next(),
+          next: () => this.paged.refresh(),
         });
       }
     });
