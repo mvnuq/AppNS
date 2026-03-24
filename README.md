@@ -86,6 +86,8 @@ DELETE /variables/{id}
 
 Levanta **DB + API + Frontend** con una sola instrucción, incluyendo inicialización de esquema y **1000 registros** de prueba.
 
+Prerequisito recomendado: tener **Docker Desktop** instalado y ejecutándose para simplificar la gestión de contenedores en entorno local.
+
 1) (Opcional) Crear `.env` raíz desde el ejemplo:
 
 ```bash
@@ -181,4 +183,4 @@ Este enfoque entrega visibilidad sobre cambios críticos y facilita análisis po
 
 ## Author
 
-
+Manuel Zepeda
