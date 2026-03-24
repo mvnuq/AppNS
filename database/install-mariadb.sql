@@ -1,40 +1,42 @@
--- Instalación MariaDB / MySQL para Neosoft.Api
--- Ajusta el nombre de la base si tu ConnectionString usa otro Database=...
-
-CREATE DATABASE IF NOT EXISTS `neosoft_db`
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
+-- 1. Estructura de Tablas (DDL)
+CREATE DATABASE IF NOT EXISTS `neosoft_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `neosoft_db`;
 
--- Tabla roles (debe existir antes que users por la FK)
-CREATE TABLE IF NOT EXISTS `roles` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` longtext NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `updated_at` datetime(6) NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS roles (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+    deleted_at DATETIME NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_roles_name (name)
+) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `full_name` longtext NOT NULL,
-  `email` longtext NOT NULL,
-  `role_id` int NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `updated_at` datetime(6) NULL,
-  PRIMARY KEY (`id`),
-  KEY `IX_users_role_id` (`role_id`),
-  CONSTRAINT `FK_users_roles_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`)
-    ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS users (
+    id INT NOT NULL AUTO_INCREMENT,
+    full_name VARCHAR(150) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    role_id INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+    deleted_at DATETIME NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_users_email (email),
+    KEY idx_users_role_id (role_id),
+    CONSTRAINT fk_users_roles FOREIGN KEY (role_id) REFERENCES roles(id)
+) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS `variables` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` longtext NOT NULL,
-  `value` longtext NOT NULL,
-  `type` longtext NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `updated_at` datetime(6) NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS variables (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    value VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+    deleted_at DATETIME NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_variables_name (name)
+) ENGINE=InnoDB;
