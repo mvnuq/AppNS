@@ -6,7 +6,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-0A66C2)](#-technical-architecture)
 
-Sistema ERP enfocado en la administración de **Usuarios**, **Roles** y **Variables**, diseñado para ser claro de mantener, fácil de desplegar y demostrable en entornos técnicos exigentes.
+Sistema enfocado en la administración de **Usuarios**, **Roles** y **Variables**, diseñado para ser claro de mantener, fácil de desplegar y demostrable en entornos técnicos exigentes.
 
 ---
 
