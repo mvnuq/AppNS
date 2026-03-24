@@ -116,11 +116,11 @@ docker compose up --build
 
 #### 1) Base de datos (MariaDB)
 
-El script de inicialización de base de datos se encuentra en: `db-init/init.sql`.
+El script de inicialización manual de base de datos se encuentra en: `db-init/sql_lite.script`.
 
 ```bash
 # script a ejecutar
-db-init/init.sql
+db-init/sql_lite.script
 ```
 
 #### 2) Backend (.NET API)
