@@ -15,6 +15,7 @@ import {
   ConfirmDialogComponent,
   ConfirmDialogData,
 } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { MaintainerTableComponent } from '../../../shared/components/maintainer-table/maintainer-table.component';
 import {
   VariableFormComponent,
   VariableFormDialogData,
@@ -25,6 +26,7 @@ import {
   standalone: true,
   imports: [
     AsyncPipe,
+    MaintainerTableComponent,
     MatCardModule,
     MatTableModule,
     MatButtonModule,

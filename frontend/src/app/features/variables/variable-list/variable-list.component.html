@@ -12,7 +12,10 @@
     </div>
 
     @if (variables$ | async; as variables) {
-      <div class="table-wrap">
+      <app-maintainer-table
+        [empty]="variables.length === 0"
+        emptyMessage="No hay variables registradas."
+      >
         <table mat-table [dataSource]="variables" class="data-table">
           <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef>ID</th>
@@ -65,11 +68,7 @@
             [@rowAnimation]
           ></tr>
         </table>
-
-        @if (variables.length === 0) {
-          <p class="empty">No hay variables registradas.</p>
-        }
-      </div>
+      </app-maintainer-table>
     }
   </mat-card-content>
 </mat-card>

@@ -1,7 +1,7 @@
 <mat-card class="neosoft-elevated-card" [@listFadeIn]>
   <mat-card-header class="card-header">
     <mat-card-title>Usuarios</mat-card-title>
-    <mat-card-subtitle>Gestión de cuentas y roles</mat-card-subtitle>
+    <mat-card-subtitle>Gestión de usuarios</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content class="card-content">
     <div class="toolbar">
@@ -12,7 +12,10 @@
     </div>
 
     @if (users$ | async; as users) {
-      <div class="table-wrap">
+      <app-maintainer-table
+        [empty]="users.length === 0"
+        emptyMessage="No hay usuarios registrados."
+      >
         <table mat-table [dataSource]="users" class="data-table">
           <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef>ID</th>
@@ -65,11 +68,7 @@
             [@rowAnimation]
           ></tr>
         </table>
-
-        @if (users.length === 0) {
-          <p class="empty">No hay usuarios registrados.</p>
-        }
-      </div>
+      </app-maintainer-table>
     }
   </mat-card-content>
 </mat-card>

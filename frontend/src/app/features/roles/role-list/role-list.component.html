@@ -12,7 +12,10 @@
     </div>
 
     @if (roles$ | async; as roles) {
-      <div class="table-wrap">
+      <app-maintainer-table
+        [empty]="roles.length === 0"
+        emptyMessage="No hay roles registrados."
+      >
         <table mat-table [dataSource]="roles" class="data-table">
           <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef>ID</th>
@@ -55,11 +58,7 @@
             [@rowAnimation]
           ></tr>
         </table>
-
-        @if (roles.length === 0) {
-          <p class="empty">No hay roles registrados.</p>
-        }
-      </div>
+      </app-maintainer-table>
     }
   </mat-card-content>
 </mat-card>

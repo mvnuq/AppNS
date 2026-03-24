@@ -23,30 +23,3 @@
     margin-right: 8px;
   }
 }
-
-.table-wrap {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-}
-
-:host ::ng-deep .data-table .mat-mdc-cell.actions-col {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-}
-
-.actions-col {
-  width: 120px;
-  text-align: right;
-  white-space: nowrap;
-}
-
-.empty {
-  margin: var(--neosoft-space-md, 16px) 0 0;
-  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
-}

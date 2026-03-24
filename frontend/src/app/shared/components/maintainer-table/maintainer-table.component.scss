@@ -1,0 +1,36 @@
+.table-wrap {
+  overflow-x: auto;
+}
+
+:host ::ng-deep .data-table {
+  width: 100%;
+}
+
+/*
+ * No usar display:flex en <td>: rompe el alineado de bordes entre columnas en mat-table.
+ * Los botones se alinean en línea con vertical-align (comportamiento de tabla real).
+ */
+:host ::ng-deep .data-table .mat-mdc-cell.actions-col,
+:host ::ng-deep .data-table .mat-mdc-header-cell.actions-col {
+  vertical-align: middle;
+  text-align: right;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .data-table .mat-mdc-cell.actions-col .mat-mdc-icon-button {
+  vertical-align: middle;
+  margin: 0;
+}
+
+:host ::ng-deep .data-table .mat-mdc-cell.actions-col .mat-mdc-icon-button + .mat-mdc-icon-button {
+  margin-inline-start: 4px;
+}
+
+:host ::ng-deep .data-table .actions-col {
+  width: 120px;
+}
+
+.empty {
+  margin: var(--neosoft-space-md, 16px) 0 0;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+}
