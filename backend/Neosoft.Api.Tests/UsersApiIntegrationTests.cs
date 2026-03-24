@@ -34,7 +34,7 @@ public sealed class UsersApiIntegrationTests : IClassFixture<ApiFactory>
         var client = _factory.CreateClient();
 
         var response = await client.PostAsJsonAsync(
-            "/api/users",
+            "/api/v1/users",
             new
             {
                 fullName = "Usuario Test",
@@ -65,7 +65,7 @@ public sealed class UsersApiIntegrationTests : IClassFixture<ApiFactory>
         var client = _factory.CreateClient();
 
         var response = await client.PostAsJsonAsync(
-            "/api/users",
+            "/api/v1/users",
             new
             {
                 fullName = "Usuario Test",
@@ -96,7 +96,7 @@ public sealed class UsersApiIntegrationTests : IClassFixture<ApiFactory>
         var client = _factory.CreateClient();
 
         var response = await client.PostAsJsonAsync(
-            "/api/users",
+            "/api/v1/users",
             new
             {
                 fullName = "Usuario Test",
@@ -129,7 +129,7 @@ public sealed class UsersApiIntegrationTests : IClassFixture<ApiFactory>
         var targetId = await db.Users.OrderBy(u => u.Id).Skip(1).Select(u => u.Id).FirstAsync();
 
         var client = _factory.CreateClient();
-        var response = await client.GetAsync($"/api/users?pageNumber=1&pageSize=10&filterId={targetId}");
+        var response = await client.GetAsync($"/api/v1/users?pageNumber=1&pageSize=10&filterId={targetId}");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 

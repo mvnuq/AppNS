@@ -1,6 +1,6 @@
 namespace Neosoft.Api.Models.DTOs;
 
 /// <summary>
-/// Minimal role data for dropdowns (avoids exposing entity navigation properties).
+/// Rol en listados y dropdown (sin navegaciones).
 /// </summary>
-public sealed record RoleListItemDto(int Id, string Name);
+public sealed record RoleListItemDto(int Id, string Name, DateTime CreatedAt, DateTime? UpdatedAt);

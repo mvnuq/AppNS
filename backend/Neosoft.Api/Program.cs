@@ -3,6 +3,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Neosoft.Api.Common;
 using Neosoft.Api.Data;
 using Neosoft.Api.DependencyInjection;
@@ -21,7 +22,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+        // Fechas en JSON como ISO 8601 en hora Chile (America/Santiago); en BD siguen en UTC.
+        options.SerializerSettings.Converters.Add(new ChileDateTimeNewtonsoftConverter());
+        options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+        options.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
     });
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {

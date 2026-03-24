@@ -17,6 +17,7 @@ import {
   ConfirmDialogData,
 } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MaintainerTableComponent } from '../../../shared/components/maintainer-table/maintainer-table.component';
+import { openMetadataDialog } from '../../../shared/components/metadata-dialog/open-metadata-dialog';
 import {
   UserFormComponent,
   UserFormDialogData,
@@ -106,6 +107,13 @@ export class UserListComponent {
           this.paged.refresh();
         }
       });
+  }
+
+  viewMetadata(user: User): void {
+    openMetadataDialog(this.dialog, {
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
   }
 
   confirmDelete(user: User): void {

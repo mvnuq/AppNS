@@ -55,6 +55,15 @@
                 <button
                   mat-icon-button
                   type="button"
+                  matTooltip="Ver detalle"
+                  aria-label="Ver detalle"
+                  (click)="viewMetadata(row)"
+                >
+                  <mat-icon>info_outline</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  type="button"
                   color="warn"
                   matTooltip="Eliminar"
                   (click)="confirmDelete(row)"

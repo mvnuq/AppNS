@@ -17,6 +17,7 @@ import {
   ConfirmDialogData,
 } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MaintainerTableComponent } from '../../../shared/components/maintainer-table/maintainer-table.component';
+import { openMetadataDialog } from '../../../shared/components/metadata-dialog/open-metadata-dialog';
 import {
   RoleFormComponent,
   RoleFormDialogData,
@@ -96,6 +97,13 @@ export class RoleListComponent {
           this.paged.refresh();
         }
       });
+  }
+
+  viewMetadata(role: RoleListItem): void {
+    openMetadataDialog(this.dialog, {
+      createdAt: role.createdAt,
+      updatedAt: role.updatedAt,
+    });
   }
 
   confirmDelete(role: RoleListItem): void {

@@ -14,8 +14,7 @@ import {
 } from '../models/paging.model';
 
 /**
- * Clave interna para `rxResource`: al cambiar `queryParams` o `refreshTick` se dispara
- * de nuevo el loader (equivalente a useEffect con dependencias [params, refresh]).
+ * Clave interna para `rxResource`: al cambiar `queryParams` o `refreshTick`
  */
 type PagedRequestKey = QueryParameters & { readonly _refresh: number };
 
@@ -33,8 +32,6 @@ export interface PagedListController<T> {
 }
 
 /**
- * Fábrica (SRP): encapsula la reactividad tipo useEffect — `request` depende de señales;
- * cuando cambian, `rxResource` vuelve a ejecutar el loader (Observable HTTP).
  */
 export function createPagedListResource<T>(
   fetchPage: (params: QueryParameters) => Observable<PagedResponse<T>>,
